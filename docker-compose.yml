@@ -42,6 +42,15 @@ services:
     networks:
       - horarios-network
 
+  webapp:
+    build:
+      context: ../app-horarios
+      dockerfile: Dockerfile.react
+    ports:
+      - "5173:5173"
+    networks:
+      - horarios-network
+      
 networks: 
   horarios-network:
     driver: bridge
