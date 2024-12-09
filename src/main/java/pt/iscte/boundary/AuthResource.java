@@ -3,11 +3,13 @@ package pt.iscte.boundary;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.microprofile.jwt.JsonWebToken;
+
+import io.quarkus.logging.Log;
 import pt.iscte.controllers.AuthController;
 import pt.iscte.helper.ErrorHelper;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -25,54 +27,104 @@ public class AuthResource {
   @Inject
   AuthController authController;
 
-  @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  @Path("/login/student")
-  public Response loginAluno() {
-    return Response.ok().build();
-  }
+  @Inject
+  JsonWebToken jwt;
 
-  // TODO - Check if the user was created and send a server error if it hasn't
   /**
    * This endpoint is used for alunos to register their account
    * 
    * @param credentials - The request body
-   * @return A success response stating the user was created
+   * @return A success response with the access token
    */
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   @Path("/register/student")
   public Response registerAluno(Map<String, Object> credentials) {
+    Log.info("/auth/register/student called");
     if (authController.verifyCredentials(credentials, Set.of("username, email, password", "turmas"))) {
+      Log.error("Some credential is missing");
       return Response.status(Status.BAD_REQUEST).entity(ErrorHelper.getErrorEntity("Something is missing")).build();
     }
 
     authController.registerAluno(credentials);
 
-    return Response.ok().build();
+    String token = authController.generateNewToken((String) credentials.get("username"), Set.of("Aluno"));
 
+    return Response.ok()
+        .entity(Map.of("token", token, "expiresIn", 3600))
+        .build();
   }
 
   /**
    * This endpoint is used for professsores to register their account
    * 
    * @param credentials - The request body
-   * @return A success response stating the user was created
+   * @return A success response with the access token
    */
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   @Path("/register/professor")
   public Response registerProfessor(Map<String, Object> credentials) {
+    Log.info("/auth/register/professor called");
     if (authController.verifyCredentials(credentials, Set.of("username, email, password"))) {
+      Log.error("Some credential is missing");
       return Response.status(Status.BAD_REQUEST).entity(ErrorHelper.getErrorEntity("Something is missing")).build();
     }
 
     authController.registarProfessor(credentials);
 
-    return Response.ok().build();
+    String token = authController.generateNewToken((String) credentials.get("username"), Set.of("Professor"));
 
+    return Response.ok()
+        .entity(Map.of("token", token, "expiresIn", 3600))
+        .build();
   }
 
+  /**
+   * This endpoint is used for professsores to login in their account
+   * 
+   * @param credentials - The request body
+   * @return A success response with the access token if login was successful
+   */
+  @POST
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  @Path("/login/professor")
+  public Response loginProfessor(Map<String, Object> credentials) {
+    if (authController.verifyCredentials(credentials, Set.of("email, password"))) {
+      return Response.status(Status.BAD_REQUEST).entity(ErrorHelper.getErrorEntity("Something is missing")).build();
+    }
+
+    if (!authController.verifyUsernameAndPassword(credentials, "Professor")) {
+      return Response.status(Status.FORBIDDEN).entity(ErrorHelper.getErrorEntity("Wrong username or password")).build();
+    }
+
+    String token = authController.generateNewToken((String) credentials.get("username"), Set.of("Professor"));
+
+    return Response.ok()
+        .entity(Map.of("token", token, "expiresIn", 3600))
+        .build();
+  }
+
+  @POST
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  @Path("/login/aluno")
+  public Response loginAluno(Map<String, Object> credentials) {
+    if (authController.verifyCredentials(credentials, Set.of("email, password"))) {
+      return Response.status(Status.BAD_REQUEST).entity(ErrorHelper.getErrorEntity("Something is missing")).build();
+    }
+
+    if (!authController.verifyUsernameAndPassword(credentials, "Aluno")) {
+      return Response.status(Status.FORBIDDEN).entity(ErrorHelper.getErrorEntity("Wrong username or password")).build();
+    }
+
+    String token = authController.generateNewToken((String) credentials.get("username"), Set.of("Aluno"));
+
+    return Response.ok()
+        .entity(Map.of("token", token, "expiresIn", 3600))
+        .build();
+  }
 }
