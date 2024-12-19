@@ -7,6 +7,7 @@ import org.eclipse.microprofile.jwt.JsonWebToken;
 
 import io.quarkus.logging.Log;
 import pt.iscte.controllers.AuthController;
+import pt.iscte.enums.Roles;
 import pt.iscte.helper.ErrorHelper;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -33,23 +34,22 @@ public class AuthResource {
   /**
    * This endpoint is used for alunos to register their account
    * 
-   * @param credentials - The request body
+   * @param credentials - The request body with {username, email, password, turma}
    * @return A success response with the access token
    */
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
-  @Path("/register/student")
+  @Path("/register/aluno")
   public Response registerAluno(Map<String, Object> credentials) {
-    Log.info("/auth/register/student called");
-    if (authController.verifyCredentials(credentials, Set.of("username, email, password", "turmas"))) {
+    if (authController.verifyCredentials(credentials, Set.of("username, email, password", "turma"))) {
       Log.error("Some credential is missing");
       return Response.status(Status.BAD_REQUEST).entity(ErrorHelper.getErrorEntity("Something is missing")).build();
     }
 
     authController.registerAluno(credentials);
 
-    String token = authController.generateNewToken((String) credentials.get("username"), Set.of("Aluno"));
+    String token = authController.generateNewToken((String) credentials.get("email"), Set.of(Roles.ALUNO.name()));
 
     return Response.ok()
         .entity(Map.of("token", token, "expiresIn", 3600))
@@ -59,7 +59,7 @@ public class AuthResource {
   /**
    * This endpoint is used for professsores to register their account
    * 
-   * @param credentials - The request body
+   * @param credentials - The request body with {username, email, password}
    * @return A success response with the access token
    */
   @POST
@@ -75,7 +75,7 @@ public class AuthResource {
 
     authController.registarProfessor(credentials);
 
-    String token = authController.generateNewToken((String) credentials.get("username"), Set.of("Professor"));
+    String token = authController.generateNewToken((String) credentials.get("email"), Set.of(Roles.PROFESSOR.name()));
 
     return Response.ok()
         .entity(Map.of("token", token, "expiresIn", 3600))
@@ -97,11 +97,11 @@ public class AuthResource {
       return Response.status(Status.BAD_REQUEST).entity(ErrorHelper.getErrorEntity("Something is missing")).build();
     }
 
-    if (!authController.verifyUsernameAndPassword(credentials, "Professor")) {
+    if (!authController.verifyUsernameAndPassword(credentials, Roles.PROFESSOR.name())) {
       return Response.status(Status.FORBIDDEN).entity(ErrorHelper.getErrorEntity("Wrong username or password")).build();
     }
 
-    String token = authController.generateNewToken((String) credentials.get("username"), Set.of("Professor"));
+    String token = authController.generateNewToken((String) credentials.get("email"), Set.of(Roles.PROFESSOR.name()));
 
     return Response.ok()
         .entity(Map.of("token", token, "expiresIn", 3600))
@@ -117,11 +117,11 @@ public class AuthResource {
       return Response.status(Status.BAD_REQUEST).entity(ErrorHelper.getErrorEntity("Something is missing")).build();
     }
 
-    if (!authController.verifyUsernameAndPassword(credentials, "Aluno")) {
+    if (!authController.verifyUsernameAndPassword(credentials, Roles.ALUNO.name())) {
       return Response.status(Status.FORBIDDEN).entity(ErrorHelper.getErrorEntity("Wrong username or password")).build();
     }
 
-    String token = authController.generateNewToken((String) credentials.get("username"), Set.of("Aluno"));
+    String token = authController.generateNewToken((String) credentials.get("email"), Set.of(Roles.ALUNO.name()));
 
     return Response.ok()
         .entity(Map.of("token", token, "expiresIn", 3600))

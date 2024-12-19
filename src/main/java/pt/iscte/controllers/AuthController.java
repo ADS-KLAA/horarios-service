@@ -1,10 +1,12 @@
 package pt.iscte.controllers;
 
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
@@ -19,7 +21,9 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import pt.iscte.entities.Aluno;
+import pt.iscte.entities.Professor;
 import pt.iscte.repositories.AlunoRepository;
+import pt.iscte.repositories.ProfessorRepository;
 
 /**
  * This controller is responsible to generatink tokens for user logins and new
@@ -32,13 +36,22 @@ public class AuthController {
   String issuer;
 
   @Inject
+  AlunoController alunoController;
+
+  @Inject
   AlunoRepository alunoRepository;
 
-  public String generateNewToken(@NotNull String username, @NotNull Set<String> groups) {
+  @Inject
+  ProfessorController professorController;
+
+  @Inject
+  ProfessorRepository professorRepository;
+
+  public String generateNewToken(@NotNull String email, @NotNull Set<String> groups) {
     return Jwt
         .issuer(issuer)
-        .subject(username)
-        .upn(username)
+        .subject(email)
+        .upn(email)
         .groups(groups)
         .expiresIn(3600L)
         .sign();
@@ -52,7 +65,10 @@ public class AuthController {
    * @return - boolean indicating if the properties sent are valid
    */
   public boolean verifyCredentials(Map<String, Object> credentials, Set<String> properties) {
-    return properties.stream().filter(property -> !credentials.values().contains(property)).toList().isEmpty();
+    List<String> sentKeys = Arrays.asList(credentials.keySet().stream().collect(Collectors.toList()).getFirst().split(", "));
+    List<String> missingCredentials = properties.stream().filter(key -> {Log.info(key);return sentKeys.contains(key);}).toList();
+    Log.error(sentKeys + " " + properties + " " + missingCredentials);
+    return missingCredentials.isEmpty();
   }
 
   /**
@@ -67,7 +83,7 @@ public class AuthController {
         .name((String) credentials.get("username"))
         .email((String) credentials.get("email"))
         .password(hashedPassword)
-        .turma((String) credentials.get("turmas"))
+        .turma((String) credentials.get("turma"))
         .build();
 
     alunoRepository.persist(aluno);
@@ -80,6 +96,13 @@ public class AuthController {
    */
   @Transactional
   public void registarProfessor(Map<String, Object> credentials) {
+    String hashedPassword = hashPassword((String) credentials.get("password"));
+    Professor professor = new Professor.Builder()
+        .name((String) credentials.get("username"))
+        .email((String) credentials.get("email"))
+        .password(hashedPassword)
+        .build();
+    professorRepository.persist(professor);
   }
 
   /**
@@ -91,6 +114,14 @@ public class AuthController {
    */
   @Transactional
   public boolean verifyUsernameAndPassword(Map<String, Object> credentials, String role) {
+    String email = (String) credentials.get("email");
+    String hashedPassword = hashPassword((String) credentials.get("password"));
+
+    if (role.equals("Aluno")) {
+      return alunoController.verifyUsernameAndPassword(email, hashedPassword);
+    } else if (role.equals("Professor")) {
+      return professorController.verifyUsernameAndPassword(email, hashedPassword);
+    }
     return false;
   }
 

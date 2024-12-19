@@ -4,13 +4,13 @@ import java.util.Arrays;
 import java.util.List;
 
 public enum DiaSemana {
-    SEG("SEG"),
-    TER("TER"),
-    QUA("QUA"),
-    QUI("QUI"),
-    SEX("SEX"),
-    SAB("SAB"),
-    DOM("DOM");
+    Seg("Seg"),
+    Ter("Ter"),
+    Qua("Qua"),
+    Qui("Qui"),
+    Sex("Sex"),
+    Sáb("Sáb"),
+    Dom("Dom");
 
     private String name;
 

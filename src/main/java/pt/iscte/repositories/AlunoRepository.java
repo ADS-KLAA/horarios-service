@@ -10,5 +10,9 @@ import jakarta.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class AlunoRepository implements PanacheRepository<Aluno>{
 
+	public boolean verifyUsernameAndPassword(String email, String hashedPassword) {
+    return !find("email = ?1 and password = ?2", email, hashedPassword).list().isEmpty();
+	}
+
   
 }
