@@ -1,0 +1,32 @@
+services:
+  database:
+    image: 'postgres:latest'
+    ports:
+      - 15432:5432
+    environment:
+        POSTGRES_DB: horarios-db
+        POSTGRES_USER: username 
+        POSTGRES_PASSWORD: password
+    networks:
+      - horarios-network
+    volumes:
+      - ./db-data/:/var/lib/postgresql/data/
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+  
+  pgadmin:
+    image: dpage/pgadmin4
+    ports:
+      - 8888:80
+    environment:
+        PGADMIN_DEFAULT_EMAIL: horarios@email.com 
+        PGADMIN_DEFAULT_PASSWORD: password 
+    depends_on:
+      - database
+    networks:
+      - horarios-network
+    volumes:
+      - ./pgadmin-data/:/var/lib/pgadmin/
+ 
+networks: 
+  horarios-network:
+    driver: bridge

@@ -43,6 +43,7 @@ nb-configuration.xml
 /.quarkus/cli/plugins/
 # TLS Certificates
 .certs/
-
+# Docker compose env
+pgadmin-data/
 #db
 db-data/
