@@ -20,11 +20,11 @@ public enum DiaSemana {
 
     @Override
     public String toString() {
-      return this.name;
+        return this.name;
     }
- 
-    public List<DiaSemana> getValues(){
-      return Arrays.asList(DiaSemana.values()); 
+
+    public List<DiaSemana> getValues() {
+        return Arrays.asList(DiaSemana.values());
     }
 }
 

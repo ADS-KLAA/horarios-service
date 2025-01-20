@@ -47,9 +47,12 @@ public class AuthResource {
       return Response.status(Status.BAD_REQUEST).entity(ErrorHelper.getErrorEntity("Something is missing")).build();
     }
 
-    authController.registerAluno(credentials);
+    boolean success = authController.registerAluno(credentials);
+    if (!success) {
+      return Response.status(Status.FORBIDDEN).entity(ErrorHelper.getErrorEntity("Email already in use")).build();
+    }
 
-    String token = authController.generateNewToken((String) credentials.get("email"), Set.of(Roles.ALUNO.name()));
+    String token = authController.generateNewToken((String) credentials.get("email"), Set.of(Roles.ALUNO.toString()));
 
     return Response.ok()
         .entity(Map.of("token", token, "expiresIn", 3600))
@@ -73,9 +76,12 @@ public class AuthResource {
       return Response.status(Status.BAD_REQUEST).entity(ErrorHelper.getErrorEntity("Something is missing")).build();
     }
 
-    authController.registarProfessor(credentials);
+    boolean success = authController.registarProfessor(credentials);
+    if (!success) {
+      return Response.status(Status.FORBIDDEN).entity(ErrorHelper.getErrorEntity("Email already in use")).build();
+    }
 
-    String token = authController.generateNewToken((String) credentials.get("email"), Set.of(Roles.PROFESSOR.name()));
+    String token = authController.generateNewToken((String) credentials.get("email"), Set.of(Roles.PROFESSOR.toString()));
 
     return Response.ok()
         .entity(Map.of("token", token, "expiresIn", 3600))
@@ -97,11 +103,11 @@ public class AuthResource {
       return Response.status(Status.BAD_REQUEST).entity(ErrorHelper.getErrorEntity("Something is missing")).build();
     }
 
-    if (!authController.verifyUsernameAndPassword(credentials, Roles.PROFESSOR.name())) {
+    if (!authController.verifyUsernameAndPassword(credentials, Roles.PROFESSOR.toString())) {
       return Response.status(Status.FORBIDDEN).entity(ErrorHelper.getErrorEntity("Wrong username or password")).build();
     }
 
-    String token = authController.generateNewToken((String) credentials.get("email"), Set.of(Roles.PROFESSOR.name()));
+    String token = authController.generateNewToken((String) credentials.get("email"), Set.of(Roles.PROFESSOR.toString()));
 
     return Response.ok()
         .entity(Map.of("token", token, "expiresIn", 3600))
@@ -117,11 +123,11 @@ public class AuthResource {
       return Response.status(Status.BAD_REQUEST).entity(ErrorHelper.getErrorEntity("Something is missing")).build();
     }
 
-    if (!authController.verifyUsernameAndPassword(credentials, Roles.ALUNO.name())) {
+    if (!authController.verifyUsernameAndPassword(credentials, Roles.ALUNO.toString())) {
       return Response.status(Status.FORBIDDEN).entity(ErrorHelper.getErrorEntity("Wrong username or password")).build();
     }
 
-    String token = authController.generateNewToken((String) credentials.get("email"), Set.of(Roles.ALUNO.name()));
+    String token = authController.generateNewToken((String) credentials.get("email"), Set.of(Roles.ALUNO.toString()));
 
     return Response.ok()
         .entity(Map.of("token", token, "expiresIn", 3600))

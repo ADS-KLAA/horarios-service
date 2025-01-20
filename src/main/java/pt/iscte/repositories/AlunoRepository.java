@@ -4,6 +4,8 @@ import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import pt.iscte.entities.*;
 import jakarta.enterprise.context.ApplicationScoped;
 
+import java.util.Set;
+
 /**
  * AulaRepository 
  */
@@ -14,5 +16,8 @@ public class AlunoRepository implements PanacheRepository<Aluno>{
     return !find("email = ?1 and password = ?2", email, hashedPassword).list().isEmpty();
 	}
 
+	public String getAlunoTurma(String username) {
+        return find("email", username).firstResult().turma;
+	}
   
 }
