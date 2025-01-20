@@ -3,15 +3,8 @@ package pt.iscte.entities;
 import java.util.Set;
 import java.util.UUID;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import org.hibernate.Hibernate;
 
 /**
  * Professor
@@ -34,7 +27,7 @@ public class Professor {
   @Column(name = "password", nullable = false)
   public String password;
 
-  @ManyToMany
+  @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(
     name = "t_teacher_class", 
     joinColumns = @JoinColumn(name = "teacher_id"), 
@@ -51,6 +44,22 @@ public class Professor {
 
   public Professor() {
 
+  }
+
+  public String getEmail() {
+    return email;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public Set<Aula> getAulas() {
+    return aulas;
+  }
+
+  public void setAulas(Set<Aula> aulas) {
+    this.aulas = aulas;
   }
 
   public static class Builder {

@@ -44,6 +44,14 @@ public class Aluno {
 
   }
 
+  public String getName() {
+    return name;
+  }
+
+  public String getEmail() {
+    return email;
+  }
+
   public static class Builder {
     public String name;
     public String email;
