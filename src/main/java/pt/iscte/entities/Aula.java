@@ -44,11 +44,19 @@ public class Aula {
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-            name = "t_student_class",
-            joinColumns = @JoinColumn(name = "student_id"),
-            inverseJoinColumns = @JoinColumn(name = "class_id")
+            name = "t_student_class_confirmation",
+            joinColumns = @JoinColumn(name = "class_id"),
+            inverseJoinColumns = @JoinColumn(name = "student_id")
     )
     public Set<Aluno> confirmados;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "t_student_class_attendance",
+            joinColumns = @JoinColumn(name = "class_id"),
+            inverseJoinColumns = @JoinColumn(name = "student_id")
+    )
+    public Set<Aluno> presencas;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "dia_semana", nullable = false)
@@ -85,6 +93,10 @@ public class Aula {
 
     public void addConfirmation(Aluno aluno) {
         this.confirmados.add(aluno);
+    }
+
+    public void addPresenca(Aluno aluno) {
+        this.presencas.add(aluno);
     }
 
     public static class Builder {
