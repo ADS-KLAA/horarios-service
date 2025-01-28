@@ -48,13 +48,25 @@ public class AlunoResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed("Aluno")
     @Path("/confirmar/{aulaId}")
-    public Response confirmAula(@PathParam("aulaId") String aulaId){
-       boolean success = alunoController.confirmAula(aulaId);
-       if (!success) {
-          return Response.status(Response.Status.BAD_REQUEST).entity("Aula doesn't exist").build();
-       }
-         return Response.ok().entity("Aula confirmed").build();
+    public Response confirmAula(@PathParam("aulaId") String aulaId) {
+        boolean success = alunoController.confirmAula(aulaId);
+        if (!success) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Aula doesn't exist").build();
+        }
+        return Response.ok().entity("Aula confirmed").build();
     }
 
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @RolesAllowed("Aluno")
+    @Path("/attend/{aulaId}")
+    public Response attendAula(@PathParam("aulaId") String aulaId) {
+        boolean success = alunoController.attendAula(aulaId);
+        if (!success) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Aula doesn't exist").build();
+        }
+        return Response.ok().entity("Aula marked as attended").build();
+    }
 
 }

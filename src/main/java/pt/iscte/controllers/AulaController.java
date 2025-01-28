@@ -3,6 +3,7 @@ package pt.iscte.controllers;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -67,5 +68,10 @@ public class AulaController {
                .list()
                .stream()
                .collect(Collectors.toSet());
+    }
+
+    @Transactional
+    public  Aula getAulaFromId(String uuid) {
+        return aulaRepository.find("id = ?1", UUID.fromString(uuid)).firstResult();
     }
 }

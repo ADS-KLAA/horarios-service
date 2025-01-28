@@ -64,4 +64,16 @@ public class AlunoController {
         aula.addConfirmation(aluno);
         return true;
     }
+
+    @Transactional
+    public boolean attendAula(String aulaId) {
+        String username = jwt.getSubject();
+        Aluno aluno = alunoRepository.find("email", username).firstResult();
+        Aula aula = aulaRepository.find("id", UUID.fromString(aulaId)).firstResult();
+        if (aula == null) {
+            return false;
+        }
+        aula.addPresenca(aluno);
+        return true;
+    }
 }
