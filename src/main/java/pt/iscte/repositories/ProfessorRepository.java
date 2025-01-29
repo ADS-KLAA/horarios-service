@@ -28,7 +28,7 @@ public class ProfessorRepository implements PanacheRepository<Professor> {
           return false;
         }
         Professor professor = professorList.getFirst();
-        professor.setAulas(aulas);
+        professor.addAula(aulas);
         return true;
     }
 
