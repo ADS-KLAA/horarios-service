@@ -26,21 +26,21 @@ public class Aluno {
     @Column(name = "password", nullable = false)
     public String password;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "t_student_class_confirmation",
-            joinColumns = @JoinColumn(name = "student_id"),
-            inverseJoinColumns = @JoinColumn(name = "class_id")
-    )
-    public Set<Aula> aulasConfirmadas;
-
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "t_student_class_attendance",
-            joinColumns = @JoinColumn(name = "student_id"),
-            inverseJoinColumns = @JoinColumn(name = "class_id")
-    )
-    public Set<Aula> aulasPresentes;
+//    @ManyToMany(fetch = FetchType.EAGER)
+//    @JoinTable(
+//            name = "t_student_class_confirmation",
+//            joinColumns = @JoinColumn(name = "student_id"),
+//            inverseJoinColumns = @JoinColumn(name = "class_id")
+//    )
+//    public Set<Aula> aulasConfirmadas;
+//
+//    @ManyToMany(fetch = FetchType.EAGER)
+//    @JoinTable(
+//            name = "t_student_class_attendance",
+//            joinColumns = @JoinColumn(name = "student_id"),
+//            inverseJoinColumns = @JoinColumn(name = "class_id")
+//    )
+//    public Set<Aula> aulasPresentes;
 
     @Column(name = "turma", nullable = false)
     public String turma;
@@ -51,8 +51,6 @@ public class Aluno {
         this.email = email;
         this.password = password;
         this.turma = turma;
-        this.aulasPresentes = Set.of();
-        this.aulasConfirmadas = Set.of();
     }
 
     public Aluno() {
@@ -69,14 +67,6 @@ public class Aluno {
 
     public String getTurma() {
         return turma;
-    }
-
-    public Set<Aula> getAulasConfirmadas() {
-        return aulasConfirmadas;
-    }
-
-    public Set<Aula> getAulasPresentes() {
-        return aulasPresentes;
     }
 
     public static class Builder {
